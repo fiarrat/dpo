@@ -1,0 +1,29 @@
+# --- ядро ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+SQLAlchemy==2.0.36
+alembic==1.14.0
+python-multipart==0.0.20
+python-dateutil==2.9.0.post0
+
+# --- извлечение текста из вложений ---
+pdfminer.six==20240706        # PDF -> текст (чистый Python, без системных зависимостей)
+pypdf==5.1.0                  # метаданные / постраничная разбивка PDF
+python-docx==1.1.2            # .docx (типовые ответы, вложения)
+openpyxl==3.1.5               # .xlsx вложения
+Pillow==11.0.0                # подготовка изображений к OCR
+pytesseract==0.3.13           # OCR (нужен системный tesseract-ocr + rus)
+pdf2image==1.17.0             # растеризация сканов PDF (нужен poppler-utils)
+chardet==5.2.0                # определение кодировки писем/текстов
+
+# --- почта ---
+imap-tools==1.7.4             # приём обращений из почтового ящика по IMAP
+
+# --- ИИ-разбор (опционально, работает и без ключа) ---
+anthropic==0.42.0
+
+# --- тесты ---
+pytest==8.3.4
+httpx==0.28.1

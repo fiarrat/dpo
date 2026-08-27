@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Реестр обращений по персональным данным</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Боковая навигация ─────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand__mark">ПД</div>
+      <div class="brand__text">
+        <strong>Реестр обращений</strong>
+        <span>ФЗ-152 · ст. 14, 20, 21</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav__item is-active" data-view="registry">
+        <span class="nav__icon">▤</span> Реестр обращений
+        <span class="nav__badge" id="nav-count"></span>
+      </button>
+      <button class="nav__item" data-view="analyze">
+        <span class="nav__icon">⌸</span> Разбор документа
+      </button>
+      <button class="nav__item" data-view="templates">
+        <span class="nav__icon">✉</span> Типовые ответы
+      </button>
+      <button class="nav__item" data-view="reference">
+        <span class="nav__icon">⚙</span> Справочники
+      </button>
+    </nav>
+
+    <div class="sidebar__spacer"></div>
+
+    <div class="sysbox" id="sysbox"></div>
+
+    <button class="theme-toggle" id="theme-toggle" title="Сменить тему">
+      <span class="theme-toggle__dot"></span> Тема
+    </button>
+  </aside>
+
+  <!-- ── Основная область ──────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ============ РЕЕСТР ============ -->
+    <section class="view is-active" data-view="registry">
+      <header class="topbar">
+        <div>
+          <h1>Реестр обращений</h1>
+          <p class="topbar__sub" id="registry-sub">Загрузка…</p>
+        </div>
+        <div class="topbar__actions">
+          <a class="btn btn--ghost" href="/api/requests/export.csv" download>Выгрузить CSV</a>
+          <button class="btn btn--primary" id="btn-new">＋ Новое обращение</button>
+        </div>
+      </header>
+
+      <div class="tiles" id="tiles"></div>
+
+      <div class="filters" id="filters">
+        <div class="filters__row">
+          <div class="search">
+            <span class="search__icon">⌕</span>
+            <input type="search" id="f-q" placeholder="Поиск: номер, тема, текст, заявитель, юрлицо…">
+          </div>
+          <button class="btn btn--ghost" id="btn-reset">Сбросить</button>
+          <button class="btn btn--ghost" id="btn-toggle-filters">Фильтры ▾</button>
+        </div>
+        <div class="filters__grid" id="filters-grid" hidden></div>
+        <div class="chips" id="active-chips"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" id="table">
+          <thead>
+            <tr>
+              <th class="th-flags" title="Флажки">⚑</th>
+              <th data-sort="reg_number">Номер</th>
+              <th data-sort="due_date">Срок</th>
+              <th>Тип обращения</th>
+              <th>Вид субъекта</th>
+              <th>Заявитель</th>
+              <th>Ящик получения</th>
+              <th>Юридическое лицо</th>
+              <th>Сервис / процесс</th>
+              <th>Статус</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>
+          <p>Ничего не найдено.</p>
+          <button class="btn btn--ghost" id="btn-reset-2">Сбросить фильтры</button>
+        </div>
+      </div>
+
+      <div class="pager" id="pager"></div>
+    </section>
+
+    <!-- ============ РАЗБОР ДОКУМЕНТА ============ -->
+    <section class="view" data-view="analyze">
+      <header class="topbar">
+        <div>
+          <h1>Разбор документа</h1>
+          <p class="topbar__sub">
+            Загрузите текст, фото или PDF — система распознает текст, определит тип
+            обращения и рассчитает срок. В реестр ничего не попадёт, пока вы этого
+            не решите.
+          </p>
+        </div>
+      </header>
+
+      <div class="split">
+        <div class="panel">
+          <div class="dropzone" id="dropzone">
+            <div class="dropzone__icon">⇪</div>
+            <p><strong>Перетащите файлы сюда</strong> или нажмите, чтобы выбрать</p>
+            <span class="muted">PDF, JPG, PNG, DOCX, XLSX, EML, TXT — до 30 МБ</span>
+            <input type="file" id="file-input" multiple hidden
+                   accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.webp,.bmp,.docx,.xlsx,.eml,.txt,.md,.csv,.html">
+          </div>
+          <ul class="filelist" id="filelist"></ul>
+
+          <label class="field">
+            <span>Тема письма</span>
+            <input type="text" id="a-subject" placeholder="Например: Запрос о предоставлении сведений">
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span>От кого (email)</span>
+              <input type="text" id="a-from" placeholder="ivanov@mail.ru">
+            </label>
+            <label class="field">
+              <span>Ящик получения</span>
+              <input type="text" id="a-inbox" list="inbox-list" placeholder="privacy@company.ru">
+              <datalist id="inbox-list"></datalist>
+            </label>
+          </div>
+          <label class="field">
+            <span>Текст обращения</span>
+            <textarea id="a-text" rows="10"
+              placeholder="Вставьте текст письма либо загрузите файл — распознанный текст появится здесь."></textarea>
+          </label>
+
+          <div class="panel__actions">
+            <button class="btn btn--primary" id="btn-analyze">Разобрать</button>
+            <button class="btn btn--ghost" id="btn-register" disabled>Зарегистрировать в реестре</button>
+          </div>
+        </div>
+
+        <div class="panel panel--result" id="analyze-result">
+          <div class="placeholder">
+            <div class="placeholder__icon">◷</div>
+            <p>Результат разбора появится здесь</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ТИПОВЫЕ ОТВЕТЫ ============ -->
+    <section class="view" data-view="templates">
+      <header class="topbar">
+        <div>
+          <h1>Типовые ответы</h1>
+          <p class="topbar__sub">
+            Загрузите свои шаблоны — система подставит в них данные обращения и
+            рассчитанные сроки. Поддерживаются плейсхолдеры
+            <code>{{ФИО}}</code>, <code>{НОМЕР}</code>, <code>[СРОК]</code>, <code>&lt;ЮЛ&gt;</code>.
+          </p>
+        </div>
+        <div class="topbar__actions">
+          <button class="btn btn--ghost" id="btn-tpl-new">＋ Написать вручную</button>
+          <button class="btn btn--primary" id="btn-tpl-upload">⇪ Загрузить файлы</button>
+          <input type="file" id="tpl-file-input" multiple hidden
+                 accept=".docx,.pdf,.txt,.md,.html">
+        </div>
+      </header>
+      <div class="tpl-grid" id="tpl-grid"></div>
+    </section>
+
+    <!-- ============ СПРАВОЧНИКИ ============ -->
+    <section class="view" data-view="reference">
+      <header class="topbar">
+        <div>
+          <h1>Справочники</h1>
+          <p class="topbar__sub">
+            Юридические лица, почтовые ящики и сервисы. От них зависит автоматическая
+            привязка обращений и подстановка реквизитов в ответы.
+          </p>
+        </div>
+      </header>
+      <div class="ref-tabs">
+        <button class="ref-tab is-active" data-ref="legal-entities">Юридические лица</button>
+        <button class="ref-tab" data-ref="inboxes">Почтовые ящики</button>
+        <button class="ref-tab" data-ref="services">Сервисы и процессы</button>
+      </div>
+      <div id="ref-content"></div>
+    </section>
+  </main>
+
+  <!-- ── Панель карточки обращения ────────────────────────────────────── -->
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="drawer" id="drawer" hidden>
+    <div class="drawer__inner" id="drawer-inner"></div>
+  </aside>
+
+  <!-- ── Модальное окно ───────────────────────────────────────────────── -->
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <div class="modal" id="modal"></div>
+  </div>
+
+  <div class="toasts" id="toasts"></div>
+</div>
+
+<script type="module" src="/assets/app.js"></script>
+</body>
+</html>

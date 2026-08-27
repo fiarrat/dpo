@@ -1,0 +1,6 @@
+-r requirements.txt
+
+pytest==8.3.4
+httpx==0.28.1
+reportlab==4.2.5      # генерация тестовых PDF
+playwright==1.49.1    # проверка интерфейса в браузере
