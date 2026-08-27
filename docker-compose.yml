@@ -1,0 +1,21 @@
+# Запуск одной командой:  docker compose up
+# Открыть:                http://localhost:8000
+#
+# Демонстрационные данные (один раз, до первого запуска):
+#   docker compose run --rm app python -m app.seed --reset
+
+services:
+  app:
+    build: .
+    image: dpo-registry
+    ports:
+      - "8000:8000"
+    volumes:
+      # База и вложения живут на вашем диске и переживают пересоздание контейнера.
+      - ./var:/data
+    environment:
+      # Ключ не обязателен: без него работают классификация, сроки, флажки,
+      # распознавание и драфты по шаблонам.
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      TESSERACT_LANG: "rus+eng"
+    restart: unless-stopped

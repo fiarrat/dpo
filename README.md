@@ -55,14 +55,19 @@
 
 ## Запуск
 
+Пошагово, обычным языком — в **[ЗАПУСК.md](ЗАПУСК.md)**. Коротко:
+
 ```bash
-git clone <репозиторий> && cd dpo
+# Docker — ничего настраивать не нужно, русский OCR уже внутри
+docker compose run --rm app python -m app.seed --reset
+docker compose up
 
-# распознавание фотографий и сканов (Ubuntu/Debian)
+# Linux / macOS без Docker
 sudo apt-get install -y tesseract-ocr tesseract-ocr-rus poppler-utils
-# macOS: brew install tesseract tesseract-lang poppler
-
 SEED=1 ./run.sh
+
+# Windows (PowerShell)
+.\run.ps1 -Seed
 ```
 
 Откройте **http://127.0.0.1:8000**. Ключ ИИ не нужен: классификация, сроки,
