@@ -55,7 +55,7 @@
 
 ## Запуск
 
-Пошагово, обычным языком — в **[ЗАПУСК.md](ЗАПУСК.md)**. Коротко:
+Пошагово, обычным языком — в **[ZAPUSK.md](ZAPUSK.md)**. Коротко:
 
 ```bash
 # Docker — ничего настраивать не нужно, русский OCR уже внутри
@@ -66,8 +66,7 @@ docker compose up
 sudo apt-get install -y tesseract-ocr tesseract-ocr-rus poppler-utils
 SEED=1 ./run.sh
 
-# Windows (PowerShell)
-.\run.ps1 -Seed
+# Windows — двойной клик по файлу RUN.bat
 ```
 
 Откройте **http://127.0.0.1:8000**. Ключ ИИ не нужен: классификация, сроки,
